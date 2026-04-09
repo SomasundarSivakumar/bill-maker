@@ -342,30 +342,30 @@
             }
             .receipt-container {
                 box-shadow: none;
-                width: 58mm; /* Set to 58mm printer width */
-                max-width: 58mm;
+                width: 80mm; /* Added width for larger printer (e.g., 80mm size or A4) */
+                max-width: 100%;
                 padding: 0mm; 
                 margin: 0;
-                font-size: 7px; /* Extremely small for strict thermal fitting */
+                font-size: 14px; /* Increased font size for better readability */
             }
             .receipt-container::before, .receipt-container::after {
                 display: none;
             }
             .items-table, pre {
-                font-size: 5px !important; /* Force items exactly to 5px print size */
+                font-size: 11px; /* Temporarily made smaller to fix data wrap */
             }
             .sub-header, .info-row, .totals {
-                font-size: 7px; 
+                font-size: 14px; 
             }
             .header-logo {
-                font-size: 9px !important; 
+                font-size: 18px !important; 
             }
             .divider {
-                font-size: 8px; /* Slightly larger so dashes don't disappear */
+                font-size: 11px; /* Match pre to align dashes with text */
             }
             @page {
                 margin: 0;
-                size: 50mm auto; /* Some 58mm printers need 50mm print area size specification */
+                /* Removed strict 50mm constraints to allow the larger printer to use its full page width */
             }
         }
         
@@ -571,7 +571,7 @@
             <br>
             
             <!-- Using PRE for absolute guaranteed alignment on ANY platform -->
-            <pre id="out_items_pre" style="white-space: pre-wrap; margin: 0; font-family: 'Space Mono', monospace; font-size: 5px; line-height: 1.2;"></pre>
+            <pre id="out_items_pre" style="white-space: pre-wrap; margin: 0; font-family: 'Space Mono', monospace;"></pre>
 
             <br>
             <div class="divider">--------------------------------</div>
