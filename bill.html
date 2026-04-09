@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Bill Generator</title>
+    <!-- Add Google Material Icons for form -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* App Layout */
+        .admin-panel {
+            width: 50%;
+            background: white;
+            padding: 30px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .preview-panel {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+            overflow-y: auto;
+            background-color: #cbd5e1;
+        }
+
+        /* Form Styles */
+        h2 {
+            margin-top: 0;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            margin-top: 0;
+            font-size: 1.1em;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"], select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .item-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: end;
+            background: #fff;
+            padding: 10px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .item-row input[type="number"] {
+            width: 80px;
+        }
+        
+        .item-row .item-name {
+            flex-grow: 1;
+        }
+
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            padding: 8px;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            font-size: 16px;
+            padding: 12px 24px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        /* RECEIPT STYLES */
+        .receipt-container {
+            font-family: 'Space Mono', monospace;
+            background-color: #fff;
+            color: #000;
+            width: 340px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .receipt-container::before, .receipt-container::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background-size: 20px 20px;
+        }
+        
+        .receipt-container::before {
+            top: -10px;
+            background-image: linear-gradient(135deg, white 25%, transparent 25%), linear-gradient(225deg, white 25%, transparent 25%), linear-gradient(45deg, white 25%, transparent 25%), linear-gradient(315deg, white 25%, transparent 25%);
+            background-position: -10px 0, -10px 0, 0 0, 0 0;
+        }
+
+        .receipt-container::after {
+            bottom: -10px;
+            background-image: linear-gradient(135deg, white 25%, transparent 25%), linear-gradient(225deg, white 25%, transparent 25%), linear-gradient(45deg, white 25%, transparent 25%), linear-gradient(315deg, white 25%, transparent 25%);
+            background-position: -10px 0, -10px 0, 0 0, 0 0;
+        }
+
+        .receipt-container hr {
+            border: none;
+            border-top: 1px dashed #000;
+            margin: 12px 0;
+        }
+
+        .center { text-align: center; }
+        .bold { font-weight: 700; }
+
+        .header-logo {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .logo-elite {
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 2px;
+        }
+
+        .logo-radisson {
+            font-family: sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .sub-header {
+            font-size: 0.75em;
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            margin-bottom: 4px;
+        }
+
+        .info-label {
+            width: 75px;
+            display: inline-block;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        .items-table th {
+            border-top: 1px dashed #000;
+            border-bottom: 1px dashed #000;
+            padding: 6px 0;
+            text-align: left;
+            font-weight: 700;
+        }
+        
+        .items-table th.right, .items-table td.right { text-align: right; }
+        .items-table td { padding: 6px 0; vertical-align: top; line-height: 1.3; word-break: break-all; }
+
+        .totals {
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+        .totals .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+        .amount-right { width: 70px; text-align: right; }
+
+        .net-amount {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #000;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .gst-box {
+            border: 1px solid #000;
+            padding: 10px;
+            font-size: 0.75em;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .gst-box .row { display: flex; margin-bottom: 6px; }
+        .gst-box .label { width: 125px; flex-shrink: 0; }
+
+        .signature-placeholder {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 2em;
+            color: #00008b;
+            opacity: 0.8;
+            transform: rotate(-10deg) translateY(-10px);
+            position: absolute;
+            right: 20px;
+            top: 40px;
+        }
+        
+        .signature-number {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 1.2em;
+            color: #00008b;
+            opacity: 0.8;
+            transform: rotate(-15deg);
+            position: absolute;
+            right: 15px;
+            top: 75px;
+        }
+
+        .footer {
+            font-size: 0.8em;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.4;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                display: block;
+                height: auto;
+            }
+            .admin-panel {
+                display: none;
+            }
+            .preview-panel {
+                width: 100%;
+                padding: 0;
+                background: white;
+                justify-content: flex-start;
+            }
+            .receipt-container {
+                box-shadow: none;
+                width: 78mm; /* Standard thermal width */
+                padding: 0;
+                margin: 0;
+            }
+            .receipt-container::before, .receipt-container::after {
+                display: none;
+            }
+            @page {
+                margin: 0;
+            }
+        }
+        
+        /* Mobile responsive admin */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column-reverse;
+                height: auto;
+            }
+            .admin-panel, .preview-panel {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 20px;
+            }
+            .admin-panel {
+                border-top: 2px solid #cbd5e1;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .item-row {
+                flex-wrap: wrap;
+            }
+            .item-row > div {
+                width: calc(50% - 5px);
+            }
+            .item-row .item-name {
+                width: 100%;
+            }
+            .item-row input[type="number"] {
+                width: 100%;
+            }
+            .btn-danger {
+                width: 100%;
+                margin-top: 5px;
+                display: flex;
+                justify-content: center;
+            }
+            .receipt-container {
+                width: 100%;
+                max-width: 340px;
+                box-sizing: border-box;
+            }
+            .preview-panel {
+                padding: 20px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel">
+        <h2><span class="material-icons">receipt_long</span> Bill Generator Admin</h2>
+        
+        <div class="form-section">
+            <h3>Restaurant Details</h3>
+            <div class="form-group">
+                <label>Brand Name / Logo Text</label>
+                <input type="text" id="in_brandName" value="THE ELITE RADISSON Individuals" placeholder="e.g. My Restaurant">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Unit Name (Optional)</label>
+                    <input type="text" id="in_unitName" value="A Unit of Ina Elite Hospitality Pvt. Ltd.">
+                </div>
+                <div class="form-group">
+                    <label>Cafe/Branch Name</label>
+                    <input type="text" id="in_cafeName" value="The Cafe NH75">
+                </div>
+                <div class="form-group">
+                    <label>Address Line 1</label>
+                    <input type="text" id="in_address1" value="Plot #279/4, Bellur Village, Narasapura">
+                </div>
+                <div class="form-group">
+                    <label>Address Line 2</label>
+                    <input type="text" id="in_address2" value="Hubli,Karnataka, India">
+                </div>
+                <div class="form-group">
+                    <label>Phone / Fax</label>
+                    <input type="text" id="in_phone" value="T:-+91 8152283100 | F:-+91 8152283101">
+                </div>
+                <div class="form-group">
+                    <label>Email ID</label>
+                    <input type="text" id="in_email" value="reservations.narasapura@radisson.com">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Bill Details</h3>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Bill No</label>
+                    <input type="text" id="in_billNo" value="8424">
+                </div>
+                <div class="form-group">
+                    <label>Table</label>
+                    <input type="text" id="in_table" value="23">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="in_date">
+                </div>
+                <div class="form-group">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                        Time 
+                        <span style="font-size:11px; font-weight:normal; display:flex; align-items:center;">
+                            <input type="checkbox" id="auto_time_chk" checked style="width:auto; padding:0; margin:0 4px 0 0;"> Live
+                        </span>
+                    </label>
+                    <input type="time" id="in_time">
+                </div>
+                <div class="form-group">
+                    <label>Session</label>
+                    <select id="in_session">
+                        <option>Breakfast</option>
+                        <option>Lunch</option>
+                        <option>Snacks</option>
+                        <option selected>Dinner</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Steward</label>
+                    <input type="text" id="in_steward" value="BABITA">
+                </div>
+                <div class="form-group">
+                    <label>Covers (Guests)</label>
+                    <input type="number" id="in_covers" value="3" min="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Items</h3>
+            <div id="itemsContainer">
+                <!-- Items will be generated here -->
+            </div>
+            <button class="btn" onclick="addItem()" style="margin-top: 10px;">
+                <span class="material-icons">add</span> Add Item
+            </button>
+        </div>
+
+        <div class="form-section">
+            <h3>Taxes & Charges (%)</h3>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>State GST %</label>
+                    <input type="number" id="in_sgst" value="2.5" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Central GST %</label>
+                    <input type="number" id="in_cgst" value="2.5" step="0.1">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-success" onclick="window.print()">
+            <span class="material-icons">print</span> Print Final Bill
+        </button>
+    </div>
+
+    <!-- Live Preview Panel -->
+    <div class="preview-panel">
+        <div class="receipt-container" id="printableArea">
+            <div class="center">
+                <div class="header-logo" id="out_brandName" style="font-weight: bold; font-size: 1.25em; font-family: 'Times New Roman', Times, serif; letter-spacing: 1px;"></div>
+                <div class="sub-header" id="out_unitName"></div>
+                <div class="sub-header bold" id="out_cafeName"></div>
+                <div class="sub-header" id="out_address1"></div>
+                <div class="sub-header" id="out_address2"></div>
+                <div class="sub-header" id="out_phone"></div>
+                <div class="sub-header" id="out_email"></div>
+            </div>
+            
+            <hr>
+
+            <div class="info-row">
+                <div><span class="info-label">Bill No</span>: <span id="out_billNo"></span></div>
+                <div><span class="info-label" style="width: 45px;">Table</span>: <span id="out_table"></span></div>
+            </div>
+            <div class="info-row">
+                <div><span class="info-label">Date</span>: <span id="out_date"></span></div>
+                <div style="width: 71px;" id="out_time"></div>
+            </div>
+            <div class="info-row">
+                <div><span class="info-label">Session</span>: <span id="out_session"></span></div>
+            </div>
+            <div class="info-row">
+                <div><span class="info-label">Steward</span>: <span id="out_steward"></span></div>
+            </div>
+            <div class="info-row">
+                <div><span class="info-label">Covers</span>: <span id="out_covers"></span></div>
+            </div>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Qty</th>
+                        <th style="width: 40%;">Item Name</th>
+                        <th class="right" style="width: 20%;">Rate</th>
+                        <th class="right" style="width: 25%;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="out_items">
+                    <!-- Items from JS -->
+                </tbody>
+            </table>
+
+            <hr>
+
+            <div class="totals">
+                <div class="row bold">
+                    <span>Total Amount</span>
+                    <span class="amount-right" id="out_totalAmount"></span>
+                </div>
+                <hr>
+                <div class="row">
+                    <span>State GST @<span id="out_sgst_perc"></span>%</span>
+                    <span class="amount-right" id="out_sgst_val"></span>
+                </div>
+                <div class="row">
+                    <span>Central GST @<span id="out_cgst_perc"></span>%</span>
+                    <span class="amount-right" id="out_cgst_val"></span>
+                </div>
+                <div class="net-amount">
+                    <span>Net Amount INR</span>
+                    <span id="out_netAmount"></span>
+                </div>
+                <div style="margin-top: 4px;">* Voluntary</div>
+            </div>
+
+            <hr>
+            
+            <div class="sub-header" style="margin-bottom: 8px;">Kot Nos # 8809,8810</div>
+
+            <div class="center sub-header bold" style="margin-top: 15px;">
+                On <span id="out_stampDate"></span> <span id="out_stampTime"></span>
+            </div>
+
+            <div class="footer bold">
+                *** Thank You & Visit Again ***
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default items array mimicking original bill
+        let items = [
+            { qty: 1, name: 'CHILLI CHICKEN', rate: 450.00 },
+            { qty: 1, name: 'Veg. Biryani', rate: 350.00 },
+            { qty: 3, name: 'FishFinger PROMOTIONAL DINNER', rate: 600.00 },
+            { qty: 1, name: 'SALT', rate: 1.00 },
+            { qty: 1, name: 'Soft Drink & Services', rate: 99.00 }
+        ];
+
+        // Format number to 2 decimal places
+        const formatCurrency = (num) => parseFloat(num).toFixed(2);
+
+        function renderItemsAdmin() {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <div>
+                        <label>Qty</label>
+                        <input type="number" value="${item.qty}" min="1" onchange="updateItem(${index}, 'qty', this.value)" oninput="updateItem(${index}, 'qty', this.value)" class="item-input">
+                    </div>
+                    <div class="item-name">
+                        <label>Item Name</label>
+                        <input type="text" value="${item.name}" onchange="updateItem(${index}, 'name', this.value)" oninput="updateItem(${index}, 'name', this.value)">
+                    </div>
+                    <div>
+                        <label>Rate (₹)</label>
+                        <input type="number" value="${item.rate}" step="1" onchange="updateItem(${index}, 'rate', this.value)" oninput="updateItem(${index}, 'rate', this.value)">
+                    </div>
+                    <button class="btn btn-danger" onclick="removeItem(${index})" title="Remove Item">
+                        <span class="material-icons" style="font-size:18px;">delete</span>
+                    </button>
+                `;
+                container.appendChild(row);
+            });
+            updatePreview();
+        }
+
+        function addItem() {
+            items.push({ qty: 1, name: '', rate: 0.00 });
+            renderItemsAdmin();
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            renderItemsAdmin();
+        }
+
+        function updateItem(index, field, value) {
+            if (field === 'qty' || field === 'rate') {
+                items[index][field] = parseFloat(value) || 0;
+            } else {
+                items[index][field] = value;
+            }
+            updatePreview();
+        }
+
+        let liveSeconds = '00';
+        
+        function setupAutoDate() {
+            const tick = () => {
+                const autoChk = document.getElementById('auto_time_chk');
+                if (autoChk && autoChk.checked) {
+                    const now = new Date();
+                    
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    document.getElementById('in_date').value = `${year}-${month}-${day}`;
+                    
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    liveSeconds = String(now.getSeconds()).padStart(2, '0');
+                    
+                    document.getElementById('in_time').value = `${hours}:${minutes}`;
+                    updatePreview();
+                }
+            };
+            tick();
+            setInterval(tick, 1000);
+        }
+
+        function updatePreview() {
+            // Restaurant Info
+            document.getElementById('out_brandName').innerText = document.getElementById('in_brandName').value;
+            document.getElementById('out_unitName').innerText = document.getElementById('in_unitName').value;
+            document.getElementById('out_cafeName').innerText = document.getElementById('in_cafeName').value;
+            document.getElementById('out_address1').innerText = document.getElementById('in_address1').value;
+            document.getElementById('out_address2').innerText = document.getElementById('in_address2').value;
+            document.getElementById('out_phone').innerText = document.getElementById('in_phone').value;
+            document.getElementById('out_email').innerText = document.getElementById('in_email').value;
+
+            // Header Info
+            document.getElementById('out_billNo').innerText = document.getElementById('in_billNo').value;
+            document.getElementById('out_table').innerText = document.getElementById('in_table').value;
+            
+            // Format dates DD/MM/YY
+            const inDate = document.getElementById('in_date').value; // YYYY-MM-DD
+            let outDate = '...';
+            if(inDate) {
+                const parts = inDate.split('-');
+                if(parts.length === 3) {
+                    outDate = `${parts[2]}/${parts[1]}/${parts[0].substring(2)}`;
+                }
+            }
+            document.getElementById('out_date').innerText = outDate;
+            document.getElementById('out_stampDate').innerText = outDate;
+
+            const inTime = document.getElementById('in_time').value;
+            if(inTime) {
+                document.getElementById('out_time').innerText = inTime.replace(':', '.');
+                const sec = (document.getElementById('auto_time_chk') && document.getElementById('auto_time_chk').checked) ? liveSeconds : '00';
+                document.getElementById('out_stampTime').innerText = `${inTime}:${sec}`;
+            }
+
+            document.getElementById('out_session').innerText = document.getElementById('in_session').value;
+            document.getElementById('out_steward').innerText = document.getElementById('in_steward').value.toUpperCase();
+            document.getElementById('out_covers').innerText = document.getElementById('in_covers').value;
+
+            // Render Items in Bill
+            const tbody = document.getElementById('out_items');
+            tbody.innerHTML = '';
+            let totalAmount = 0;
+
+            items.forEach(item => {
+                const amount = item.qty * item.rate;
+                totalAmount += amount;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.qty}</td>
+                    <td>${item.name}</td>
+                    <td class="right">${formatCurrency(item.rate)}</td>
+                    <td class="right">${formatCurrency(amount)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Calculations
+            const sgstPerc = parseFloat(document.getElementById('in_sgst').value) || 0;
+            const cgstPerc = parseFloat(document.getElementById('in_cgst').value) || 0;
+
+            const sgstVal = totalAmount * (sgstPerc / 100);
+            const cgstVal = totalAmount * (cgstPerc / 100);
+            
+            // Round Net Amount standard way
+            const netAmount = Math.round(totalAmount + sgstVal + cgstVal);
+
+            // Update DOM
+            document.getElementById('out_totalAmount').innerText = formatCurrency(totalAmount);
+            
+            document.getElementById('out_sgst_perc').innerText = formatCurrency(sgstPerc);
+            document.getElementById('out_sgst_val').innerText = formatCurrency(sgstVal);
+
+            document.getElementById('out_cgst_perc').innerText = formatCurrency(cgstPerc);
+            document.getElementById('out_cgst_val').innerText = formatCurrency(cgstVal);
+
+            document.getElementById('out_netAmount').innerText = '₹ ' + formatCurrency(netAmount);
+        }
+
+        // Add event listeners to all inputs to trigger update
+        document.querySelectorAll('.admin-panel input, .admin-panel select').forEach(input => {
+            // we don't attach to item inputs here because they are dynamic and handled in renderItemsAdmin
+            if(!input.classList.contains('item-input') && input.id !== 'auto_time_chk') {
+                input.addEventListener('input', (e) => {
+                    if ((e.target.id === 'in_date' || e.target.id === 'in_time') && document.getElementById('auto_time_chk')) {
+                        document.getElementById('auto_time_chk').checked = false;
+                    }
+                    updatePreview();
+                });
+                input.addEventListener('change', updatePreview);
+            }
+        });
+
+        // Add auto_time_chk listener specifically
+        const autoTimeChk = document.getElementById('auto_time_chk');
+        if(autoTimeChk) {
+             autoTimeChk.addEventListener('change', () => {
+                 if(autoTimeChk.checked) {
+                     setupAutoDate(); // will do immediate tick
+                 }
+             });
+        }
+
+        // Initialization
+        setupAutoDate();
+        renderItemsAdmin(); // this calls updatePreview internally
+    </script>
+</body>
+</html>
