@@ -6,6 +6,8 @@
     <title>Restaurant Bill Generator</title>
     <!-- Add Google Material Icons for form -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Add html2pdf for PDF Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
@@ -172,6 +174,7 @@
             padding: 30px 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1);
             position: relative;
+            font-size: 14px;
         }
 
         .receipt-container::before, .receipt-container::after {
@@ -202,6 +205,7 @@
             white-space: nowrap;
             overflow: hidden;
             letter-spacing: 1px;
+            font-size: 11px;
         }
 
         .center { text-align: center; }
@@ -261,6 +265,10 @@
         
         .items-table th.right, .items-table td.right { text-align: right; }
         .items-table td { padding: 6px 0; vertical-align: top; line-height: 1.3; word-break: break-all; }
+
+        pre {
+            font-size: 11px;
+        }
 
         .totals {
             font-size: 0.8em;
@@ -350,6 +358,9 @@
             }
             .receipt-container::before, .receipt-container::after {
                 display: none;
+            }
+            .floating-pdf-btn {
+                display: none !important;
             }
             .items-table, pre {
                 font-size: 11px; /* Temporarily made smaller to fix data wrap */
@@ -526,13 +537,23 @@
             </div>
         </div>
 
-        <button class="btn btn-success" onclick="window.print()">
-            <span class="material-icons">print</span> Print Final Bill
-        </button>
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <button class="btn btn-success" onclick="window.print()" style="margin-bottom: 0;">
+                <span class="material-icons">print</span> Print
+            </button>
+            <button class="btn btn-success" onclick="downloadPDF()" style="background-color: #f59e0b; margin-bottom: 0;" title="Download as PDF">
+                <span class="material-icons">picture_as_pdf</span> Download PDF
+            </button>
+        </div>
     </div>
 
     <!-- Live Preview Panel -->
-    <div class="preview-panel">
+    <div class="preview-panel" style="position: relative;">
+        <!-- Top right floating PDF button -->
+        <button class="btn floating-pdf-btn" onclick="downloadPDF()" style="position: absolute; top: 20px; right: 20px; background-color: #f59e0b; color: white; display: flex; align-items: center; gap: 8px; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <span class="material-icons">picture_as_pdf</span> Download PDF
+        </button>
+        
         <div class="receipt-container" id="printableArea">
             <div class="center">
                 <div class="header-logo" id="out_brandName" style="font-weight: bold; font-size: 1.25em; font-family: 'Times New Roman', Times, serif; letter-spacing: 1px;"></div>
@@ -571,7 +592,7 @@
             <br>
             
             <!-- Using PRE for absolute guaranteed alignment on ANY platform -->
-            <pre id="out_items_pre" style="white-space: pre-wrap; margin: 0; font-family: 'Space Mono', monospace;"></pre>
+            <pre id="out_items_pre" style="white-space: pre; margin: 0; font-family: 'Space Mono', monospace;"></pre>
 
             <br>
             <div class="divider">--------------------------------</div>
@@ -810,6 +831,29 @@
                      setupAutoDate(); // will do immediate tick
                  }
              });
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('printableArea');
+            const billNo = document.getElementById('in_billNo').value || 'receipt';
+            
+            // Temporary hide box shadow and border radius for clean pdf
+            const oldBoxShadow = element.style.boxShadow;
+            element.style.boxShadow = 'none';
+
+            const opt = {
+                margin:       2,
+                filename:     `Bill_${billNo}.pdf`,
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 2 },
+                // Use a custom format mapping closely to 80mm thermal paper
+                jsPDF:        { unit: 'mm', format: [80, 200], orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore styles
+                element.style.boxShadow = oldBoxShadow;
+            });
         }
 
         // Initialization
