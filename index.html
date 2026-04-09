@@ -352,7 +352,7 @@
                 display: none;
             }
             .items-table, pre {
-                font-size: 7px; 
+                font-size: 5px !important; /* Force items exactly to 5px print size */
             }
             .sub-header, .info-row, .totals {
                 font-size: 7px; 
@@ -571,7 +571,7 @@
             <br>
             
             <!-- Using PRE for absolute guaranteed alignment on ANY platform -->
-            <pre id="out_items_pre" style="white-space: pre-wrap; margin: 0; font-family: 'Space Mono', monospace;"></pre>
+            <pre id="out_items_pre" style="white-space: pre-wrap; margin: 0; font-family: 'Space Mono', monospace; font-size: 5px; line-height: 1.2;"></pre>
 
             <br>
             <div class="divider">--------------------------------</div>
