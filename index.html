@@ -195,12 +195,13 @@
             background-position: -10px 0, -10px 0, 0 0, 0 0;
         }
 
-        .receipt-container hr {
-            border: none;
-            border-top: 2px dashed #000; /* Thicker dashed or solid works better */
-            margin: 12px 0;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+        .divider {
+            text-align: center;
+            font-family: monospace;
+            margin: 6px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            letter-spacing: 1px;
         }
 
         .center { text-align: center; }
@@ -210,6 +211,7 @@
             font-size: 1.1em;
             margin-bottom: 5px;
             line-height: 1.2;
+            word-break: break-all;
         }
 
         .logo-elite {
@@ -342,33 +344,28 @@
                 box-shadow: none;
                 width: 58mm; /* Set to 58mm printer width */
                 max-width: 58mm;
-                padding: 2mm; /* Small padding so text doesn't touch the very edge */
+                padding: 0mm; 
                 margin: 0;
-                font-size: 11px; /* Smaller font for 58mm */
+                font-size: 7px; /* Extremely small for strict thermal fitting */
             }
             .receipt-container::before, .receipt-container::after {
                 display: none;
             }
-            .items-table {
-                font-size: 10px; /* Even smaller font for table to fit columns */
-                word-break: break-word;
-            }
-            .items-table th {
-                border-top: 1px solid #000 !important;
-                border-bottom: 1px solid #000 !important;
-            }
-            .items-table th, .items-table td {
-                padding: 4px 1px; /* Tighter padding */
+            .items-table, pre {
+                font-size: 7px; 
             }
             .sub-header, .info-row, .totals {
-                font-size: 10px; /* Scale down other text */
+                font-size: 7px; 
             }
             .header-logo {
-                font-size: 14px !important; /* Make sure logo is legible */
+                font-size: 9px !important; 
+            }
+            .divider {
+                font-size: 8px; /* Slightly larger so dashes don't disappear */
             }
             @page {
                 margin: 0;
-                size: 58mm auto; /* Force the page size for formatting */
+                size: 50mm auto; /* Some 58mm printers need 50mm print area size specification */
             }
         }
         
@@ -547,7 +544,9 @@
                 <div class="sub-header" id="out_email"></div>
             </div>
             
-            <hr>
+            <br>
+            <div class="divider">--------------------------------</div>
+            <br>
 
             <div class="info-row">
                 <div><span class="info-label">Bill No</span>: <span id="out_billNo"></span></div>
@@ -567,28 +566,23 @@
                 <div><span class="info-label">Covers</span>: <span id="out_covers"></span></div>
             </div>
 
-            <table width="100%" class="items-table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th align="left" style="width: 15%;">Qty</th>
-                        <th align="left" style="width: 40%;">Item Name</th>
-                        <th align="right" class="right" style="width: 20%; text-align: right;">Rate</th>
-                        <th align="right" class="right" style="width: 25%; text-align: right;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="out_items">
-                    <!-- Items from JS -->
-                </tbody>
-            </table>
+            <br>
+            <div class="divider">--------------------------------</div>
+            <br>
+            
+            <!-- Using PRE for absolute guaranteed alignment on ANY platform -->
+            <pre id="out_items_pre" style="white-space: pre-wrap; margin: 0; font-family: 'Space Mono', monospace;"></pre>
 
-            <hr>
+            <br>
+            <div class="divider">--------------------------------</div>
+            <br>
 
             <div class="totals">
                 <div class="row bold">
                     <span>Total Amount</span>
                     <span class="amount-right" id="out_totalAmount"></span>
                 </div>
-                <hr>
+                <div class="divider" style="margin: 2px 0;">--------------------------------</div>
                 <div class="row">
                     <span>State GST @<span id="out_sgst_perc"></span>%</span>
                     <span class="amount-right" id="out_sgst_val"></span>
@@ -604,7 +598,9 @@
                 <div style="margin-top: 4px;">* Voluntary</div>
             </div>
 
-            <hr>
+            <br>
+            <div class="divider">--------------------------------</div>
+            <br>
             
             <div class="sub-header" style="margin-bottom: 8px;">Kot Nos # 8809,8810</div>
 
@@ -741,24 +737,34 @@
             document.getElementById('out_steward').innerText = document.getElementById('in_steward').value.toUpperCase();
             document.getElementById('out_covers').innerText = document.getElementById('in_covers').value;
 
-            // Render Items in Bill
-            const tbody = document.getElementById('out_items');
-            tbody.innerHTML = '';
+            // Render Items via Preformatted Text for bulletproof thermal printing alignment
+            const preEl = document.getElementById('out_items_pre');
+            let textTable = "Qty Item Name         Rate  Amt\n";
             let totalAmount = 0;
 
             items.forEach(item => {
                 const amount = item.qty * item.rate;
                 totalAmount += amount;
                 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td align="left" style="vertical-align: top;">${item.qty}</td>
-                    <td align="left" style="vertical-align: top;">${item.name}</td>
-                    <td align="right" class="right" style="text-align: right; vertical-align: top;">${formatCurrency(item.rate)}</td>
-                    <td align="right" class="right" style="text-align: right; vertical-align: top;">${formatCurrency(amount)}</td>
-                `;
-                tbody.appendChild(tr);
+                // Helper to pad string
+                const padRight = (str, length) => (str + " ".repeat(length)).substring(0, length);
+                const padLeft = (str, length) => (" ".repeat(length) + str).slice(-length);
+
+                const qtyStr = padRight(String(item.qty), 3);
+                // Truncate long names to wrap logically, but for simplicity let's truncate to 15 chars or print carefully
+                let nameStr = item.name.substring(0, 16);
+                nameStr = padRight(nameStr, 17);
+                const rateStr = padLeft(Math.round(item.rate).toString(), 5);
+                const amtStr = padLeft(Math.round(amount).toString(), 6);
+
+                textTable += `${qtyStr} ${nameStr} ${rateStr} ${amtStr}\n`;
+                
+                // If name is longer, print rest on next line
+                if (item.name.length > 16) {
+                    textTable += `    ${item.name.substring(16, 33)}\n`;
+                }
             });
+            preEl.innerText = textTable;
 
             // Calculations
             const sgstPerc = parseFloat(document.getElementById('in_sgst').value) || 0;
