@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +28,7 @@
             background: white;
             padding: 30px;
             overflow-y: auto;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
             z-index: 10;
         }
 
@@ -49,7 +50,7 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .form-section {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -90,7 +91,11 @@
             margin-bottom: 5px;
         }
 
-        input[type="text"], input[type="number"], input[type="date"], input[type="time"], select {
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid #cbd5e1;
@@ -99,7 +104,8 @@
             font-family: inherit;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
@@ -129,11 +135,11 @@
             border: 1px dashed #cbd5e1;
             border-radius: 4px;
         }
-        
+
         .item-row input[type="number"] {
             width: 80px;
         }
-        
+
         .item-row .item-name {
             flex-grow: 1;
         }
@@ -160,7 +166,7 @@
             background-color: #ef4444;
             padding: 8px;
         }
-        
+
         .btn-danger:hover {
             background-color: #dc2626;
         }
@@ -179,6 +185,48 @@
             background-color: #059669;
         }
 
+        /* Printer Tab Switcher */
+        .printer-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            width: fit-content;
+        }
+
+        .printer-tab-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 22px;
+            background: #334155;
+            color: #94a3b8;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s, color 0.2s;
+            letter-spacing: 0.3px;
+        }
+
+        .printer-tab-btn .tab-icon {
+            font-size: 22px;
+        }
+
+        .printer-tab-btn.active {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .printer-tab-btn:hover:not(.active) {
+            background: #475569;
+            color: #e2e8f0;
+        }
+
         /* RECEIPT STYLES */
         .receipt-container {
             font-family: 'Space Mono', monospace;
@@ -186,12 +234,82 @@
             color: #000;
             width: 340px;
             padding: 30px 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
             position: relative;
             font-size: 14px;
+            transition: width 0.3s, font-size 0.3s, padding 0.3s;
         }
 
-        .receipt-container::before, .receipt-container::after {
+        /* ===== 58mm THERMAL RECEIPT ===== */
+        .thermal-wrap {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 70px;
+        }
+
+        .thermal-wrap.visible {
+            display: flex;
+        }
+
+        /* Torn paper edge top */
+        .thermal-edge-top {
+            width: 250px;
+            height: 14px;
+            background: #fff;
+            clip-path: polygon(0% 100%, 3% 0%, 6% 100%, 9% 0%, 12% 100%, 15% 0%,
+                    18% 100%, 21% 0%, 24% 100%, 27% 0%, 30% 100%, 33% 0%,
+                    36% 100%, 39% 0%, 42% 100%, 45% 0%, 48% 100%, 51% 0%,
+                    54% 100%, 57% 0%, 60% 100%, 63% 0%, 66% 100%, 69% 0%,
+                    72% 100%, 75% 0%, 78% 100%, 81% 0%, 84% 100%, 87% 0%,
+                    90% 100%, 93% 0%, 96% 100%, 99% 0%, 100% 100%);
+        }
+
+        /* Torn paper edge bottom */
+        .thermal-edge-bottom {
+            width: 250px;
+            height: 14px;
+            background: #e8e0cc;
+            clip-path: polygon(0% 0%, 3% 100%, 6% 0%, 9% 100%, 12% 0%, 15% 100%,
+                    18% 0%, 21% 100%, 24% 0%, 27% 100%, 30% 0%, 33% 100%,
+                    36% 0%, 39% 100%, 42% 0%, 45% 100%, 48% 0%, 51% 100%,
+                    54% 0%, 57% 100%, 60% 0%, 63% 100%, 66% 0%, 69% 100%,
+                    72% 0%, 75% 100%, 78% 0%, 81% 100%, 84% 0%, 87% 100%,
+                    90% 0%, 93% 100%, 96% 0%, 99% 100%, 100% 0%);
+        }
+
+        .thermal-receipt {
+            font-family: 'Space Mono', monospace;
+            background: #fff;
+            color: #1a1a1a;
+            width: 250px;
+            padding: 15px 12px 25px 12px;
+            box-sizing: border-box;
+            font-size: 11px;
+            line-height: 1.4;
+            box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.22);
+            text-transform: uppercase;
+        }
+
+        .thermal-receipt pre {
+            margin: 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .th-center {
+            text-align: center;
+        }
+
+        .th-bold {
+            font-weight: 700;
+        }
+
+        .receipt-container::before,
+        .receipt-container::after {
             content: "";
             position: absolute;
             left: 0;
@@ -199,7 +317,7 @@
             height: 10px;
             background-size: 20px 20px;
         }
-        
+
         .receipt-container::before {
             top: -10px;
             background-image: linear-gradient(135deg, white 25%, transparent 25%), linear-gradient(225deg, white 25%, transparent 25%), linear-gradient(45deg, white 25%, transparent 25%), linear-gradient(315deg, white 25%, transparent 25%);
@@ -222,8 +340,13 @@
             font-size: 11px;
         }
 
-        .center { text-align: center; }
-        .bold { font-weight: 700; }
+        .center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
 
         .header-logo {
             font-size: 1.1em;
@@ -276,9 +399,18 @@
             text-align: left;
             font-weight: 700;
         }
-        
-        .items-table th.right, .items-table td.right { text-align: right; }
-        .items-table td { padding: 6px 0; vertical-align: top; line-height: 1.3; word-break: break-all; }
+
+        .items-table th.right,
+        .items-table td.right {
+            text-align: right;
+        }
+
+        .items-table td {
+            padding: 6px 0;
+            vertical-align: top;
+            line-height: 1.3;
+            word-break: break-all;
+        }
 
         pre {
             font-size: 11px;
@@ -288,12 +420,17 @@
             font-size: 0.8em;
             line-height: 1.4;
         }
+
         .totals .row {
             display: flex;
             justify-content: space-between;
             padding: 2px 0;
         }
-        .amount-right { width: 70px; text-align: right; }
+
+        .amount-right {
+            width: 70px;
+            text-align: right;
+        }
 
         .net-amount {
             font-size: 1.1em;
@@ -313,8 +450,15 @@
             position: relative;
         }
 
-        .gst-box .row { display: flex; margin-bottom: 6px; }
-        .gst-box .label { width: 125px; flex-shrink: 0; }
+        .gst-box .row {
+            display: flex;
+            margin-bottom: 6px;
+        }
+
+        .gst-box .label {
+            width: 125px;
+            flex-shrink: 0;
+        }
 
         .signature-placeholder {
             font-family: 'Brush Script MT', cursive;
@@ -326,7 +470,7 @@
             right: 20px;
             top: 40px;
         }
-        
+
         .signature-number {
             font-family: 'Brush Script MT', cursive;
             font-size: 1.2em;
@@ -353,109 +497,164 @@
                 margin: 0;
                 padding: 0;
             }
+
             .admin-panel {
                 display: none;
             }
+
             .preview-panel {
                 width: 100%;
                 padding: 0;
                 background: white;
                 justify-content: flex-start;
             }
+
+            .printer-tabs {
+                display: none !important;
+            }
+
+            /* Big Size (80mm) print */
             .receipt-container {
                 box-shadow: none;
-                width: 80mm; /* Added width for larger printer (e.g., 80mm size or A4) */
+                width: 80mm;
                 max-width: 100%;
-                padding: 0mm; 
+                padding: 0mm;
                 margin: 0;
-                font-size: 14px; /* Increased font size for better readability */
+                font-size: 14px;
+                transition: none;
             }
-            .receipt-container::before, .receipt-container::after {
+
+            /* Mobile Printer (58mm) print override */
+            .receipt-container.mode-58mm {
+                width: 58mm;
+                font-size: 10px;
+                padding: 0;
+            }
+
+            .receipt-container.mode-58mm .items-table,
+            .receipt-container.mode-58mm pre {
+                font-size: 9px;
+            }
+
+            .receipt-container.mode-58mm .sub-header,
+            .receipt-container.mode-58mm .info-row,
+            .receipt-container.mode-58mm .totals {
+                font-size: 9px;
+            }
+
+            .receipt-container.mode-58mm .header-logo {
+                font-size: 11px !important;
+            }
+
+            .receipt-container::before,
+            .receipt-container::after {
                 display: none;
             }
+
             .floating-pdf-btn {
                 display: none !important;
             }
-            .items-table, pre {
-                font-size: 11px; /* Temporarily made smaller to fix data wrap */
+
+            .items-table,
+            pre {
+                font-size: 11px;
             }
-            .sub-header, .info-row, .totals {
-                font-size: 14px; 
+
+            .sub-header,
+            .info-row,
+            .totals {
+                font-size: 14px;
             }
+
             .header-logo {
-                font-size: 18px !important; 
+                font-size: 18px !important;
             }
+
             .divider {
-                font-size: 11px; /* Match pre to align dashes with text */
+                font-size: 11px;
             }
+
             @page {
                 margin: 0;
-                /* Removed strict 50mm constraints to allow the larger printer to use its full page width */
             }
         }
-        
+
         /* Mobile responsive admin */
         @media (max-width: 900px) {
             body {
                 flex-direction: column-reverse;
                 height: auto;
             }
-            .admin-panel, .preview-panel {
+
+            .admin-panel,
+            .preview-panel {
                 width: 100%;
                 box-sizing: border-box;
                 padding: 20px;
             }
+
             .admin-panel {
                 border-top: 2px solid #cbd5e1;
             }
         }
-        
+
         @media (max-width: 600px) {
-            .grid-2, .grid-3 {
+
+            .grid-2,
+            .grid-3 {
                 grid-template-columns: 1fr;
             }
+
             .item-row {
                 flex-wrap: wrap;
             }
-            .item-row > div {
+
+            .item-row>div {
                 width: calc(50% - 5px);
             }
+
             .item-row .item-name {
                 width: 100%;
             }
+
             .item-row input[type="number"] {
                 width: 100%;
             }
+
             .btn-danger {
                 width: 100%;
                 margin-top: 5px;
                 display: flex;
                 justify-content: center;
             }
+
             .receipt-container {
                 width: 100%;
                 max-width: 340px;
                 box-sizing: border-box;
             }
+
             .preview-panel {
                 padding: 20px 10px;
             }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Admin Panel -->
     <div class="admin-panel">
         <h2><span class="material-icons">receipt_long</span> Bill Generator Admin</h2>
-        
+
         <div class="form-section">
             <h3>Restaurant Details</h3>
             <div class="form-group">
                 <label class="label-with-chk">
                     <input type="checkbox" id="chk_brandName" checked onchange="updatePreview()"> Brand Name / Logo Text
                 </label>
-                <input type="text" id="in_brandName" value="THE ELITE RADISSON Individuals" placeholder="e.g. My Restaurant">
+                <input type="text" id="in_brandName" value="THE ELITE RADISSON Individuals"
+                    placeholder="e.g. My Restaurant">
             </div>
             <div class="grid-2">
                 <div class="form-group">
@@ -521,8 +720,10 @@
                 <div class="form-group">
                     <label class="label-with-chk">
                         <input type="checkbox" id="chk_time" checked onchange="updatePreview()"> Time
-                        <span style="font-size:11px; font-weight:normal; display:flex; align-items:center; margin-left: auto;">
-                            <input type="checkbox" id="auto_time_chk" checked style="width:auto; padding:0; margin:0 4px 0 0;"> Live
+                        <span
+                            style="font-size:11px; font-weight:normal; display:flex; align-items:center; margin-left: auto;">
+                            <input type="checkbox" id="auto_time_chk" checked
+                                style="width:auto; padding:0; margin:0 4px 0 0;"> Live
                         </span>
                     </label>
                     <input type="time" id="in_time">
@@ -560,7 +761,8 @@
             </div>
             <div class="form-group">
                 <label class="label-with-chk">
-                    <input type="checkbox" id="chk_timestamp" checked onchange="updatePreview()"> Print Timestamp (On date time)
+                    <input type="checkbox" id="chk_timestamp" checked onchange="updatePreview()"> Print Timestamp (On
+                    date time)
                 </label>
             </div>
             <button class="btn" onclick="addItem()" style="margin-top: 10px;">
@@ -609,14 +811,16 @@
         </div>
 
         <div class="grid-2" style="margin-bottom: 20px; gap: 10px;">
-            <button class="btn btn-success" onclick="updatePreview()" style="background-color: #6366f1; width: 100%; margin-bottom: 0;">
+            <button class="btn btn-success" onclick="updatePreview()"
+                style="background-color: #6366f1; width: 100%; margin-bottom: 0;">
                 <span class="material-icons">refresh</span> Set / Refresh Preview
             </button>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-success" onclick="window.print()" style="margin-bottom: 0; width: 50%;">
                     <span class="material-icons">print</span> Print
                 </button>
-                <button class="btn btn-success" onclick="downloadPDF()" style="background-color: #f59e0b; margin-bottom: 0; width: 50%;" title="Download as PDF">
+                <button class="btn btn-success" onclick="downloadPDF()"
+                    style="background-color: #f59e0b; margin-bottom: 0; width: 50%;" title="Download as PDF">
                     <span class="material-icons">picture_as_pdf</span> PDF
                 </button>
             </div>
@@ -625,14 +829,31 @@
 
     <!-- Live Preview Panel -->
     <div class="preview-panel" style="position: relative;">
+        <!-- Printer Type Tab Switcher -->
+        <div class="printer-tabs" style="position: absolute; top: 18px; left: 20px; z-index: 60;">
+            <button class="printer-tab-btn active" id="tab-big" onclick="setPrinterMode('big')"
+                title="Big Size Printer (80mm)">
+                <span class="material-icons tab-icon">local_printshop</span>
+                Big Size
+            </button>
+            <button class="printer-tab-btn" id="tab-mobile" onclick="setPrinterMode('mobile')"
+                title="Mobile Printer (58mm / 2 inch)">
+                <span class="material-icons tab-icon">smartphone</span>
+                Mobile Printer
+            </button>
+        </div>
+
         <!-- Top right floating PDF button -->
-        <button class="btn floating-pdf-btn" onclick="downloadPDF()" style="position: absolute; top: 20px; right: 20px; background-color: #f59e0b; color: white; display: flex; align-items: center; gap: 8px; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <button class="btn floating-pdf-btn" onclick="downloadPDF()"
+            style="position: absolute; top: 18px; right: 20px; background-color: #f59e0b; color: white; display: flex; align-items: center; gap: 8px; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             <span class="material-icons">picture_as_pdf</span> Download PDF
         </button>
-        
-        <div class="receipt-container" id="printableArea">
+
+        <div class="receipt-container" id="printableArea" style="margin-top: 70px;">
             <div class="center">
-                <div class="header-logo" id="out_brandName" style="font-weight: bold; font-size: 1.25em; font-family: 'Times New Roman', Times, serif; letter-spacing: 1px;"></div>
+                <div class="header-logo" id="out_brandName"
+                    style="font-weight: bold; font-size: 1.25em; font-family: 'Times New Roman', Times, serif; letter-spacing: 1px;">
+                </div>
                 <div class="sub-header" id="out_unitName"></div>
                 <div class="sub-header bold" id="out_cafeName"></div>
                 <div class="sub-header" id="out_address1"></div>
@@ -640,14 +861,15 @@
                 <div class="sub-header" id="out_phone"></div>
                 <div class="sub-header" id="out_email"></div>
             </div>
-            
+
             <br>
             <div class="divider">--------------------------------</div>
             <br>
 
             <div class="info-row" id="wrap_billNoTable">
                 <div id="out_billNo_wrap"><span class="info-label">Bill No</span>: <span id="out_billNo"></span></div>
-                <div id="out_table_wrap"><span class="info-label" style="width: 45px;">Table</span>: <span id="out_table"></span></div>
+                <div id="out_table_wrap"><span class="info-label" style="width: 45px;">Table</span>: <span
+                        id="out_table"></span></div>
             </div>
             <div class="info-row" id="wrap_dateTime">
                 <div id="out_date_wrap"><span class="info-label">Date</span>: <span id="out_date"></span></div>
@@ -666,7 +888,7 @@
             <br>
             <div class="divider">--------------------------------</div>
             <br>
-            
+
             <!-- Using PRE for absolute guaranteed alignment on ANY platform -->
             <pre id="out_items_pre" style="white-space: pre; margin: 0; font-family: 'Space Mono', monospace;"></pre>
 
@@ -698,7 +920,7 @@
             <br>
             <div class="divider">--------------------------------</div>
             <br>
-            
+
             <div class="sub-header" style="margin-bottom: 8px;" id="out_kot"></div>
 
             <div class="center sub-header bold" style="margin-top: 15px;" id="out_timestamp_wrap">
@@ -706,6 +928,15 @@
             </div>
 
             <div class="footer bold" id="out_footer"></div>
+        </div>
+
+        <!-- 58mm Thermal Receipt -->
+        <div class="thermal-wrap" id="thermalWrap">
+            <div class="thermal-edge-top"></div>
+            <div class="thermal-receipt" id="thermalArea">
+                <pre id="th_content"></pre>
+            </div>
+            <div class="thermal-edge-bottom"></div>
         </div>
     </div>
 
@@ -725,7 +956,7 @@
         function renderItemsAdmin() {
             const container = document.getElementById('itemsContainer');
             container.innerHTML = '';
-            
+
             items.forEach((item, index) => {
                 const row = document.createElement('div');
                 row.className = 'item-row';
@@ -771,22 +1002,22 @@
         }
 
         let liveSeconds = '00';
-        
+
         function setupAutoDate() {
             const tick = () => {
                 const autoChk = document.getElementById('auto_time_chk');
                 if (autoChk && autoChk.checked) {
                     const now = new Date();
-                    
+
                     const year = now.getFullYear();
                     const month = String(now.getMonth() + 1).padStart(2, '0');
                     const day = String(now.getDate()).padStart(2, '0');
                     document.getElementById('in_date').value = `${year}-${month}-${day}`;
-                    
+
                     const hours = String(now.getHours()).padStart(2, '0');
                     const minutes = String(now.getMinutes()).padStart(2, '0');
                     liveSeconds = String(now.getSeconds()).padStart(2, '0');
-                    
+
                     document.getElementById('in_time').value = `${hours}:${minutes}`;
                     updatePreview();
                 }
@@ -808,13 +1039,13 @@
             // Header Info
             document.getElementById('out_billNo').innerText = document.getElementById('in_billNo').value;
             document.getElementById('out_table').innerText = document.getElementById('in_table').value;
-            
+
             // Format dates DD/MM/YY
             const inDate = document.getElementById('in_date').value; // YYYY-MM-DD
             let outDate = '...';
-            if(inDate) {
+            if (inDate) {
                 const parts = inDate.split('-');
-                if(parts.length === 3) {
+                if (parts.length === 3) {
                     outDate = `${parts[2]}/${parts[1]}/${parts[0].substring(2)}`;
                 }
             }
@@ -822,7 +1053,7 @@
             document.getElementById('out_stampDate').innerText = outDate;
 
             const inTime = document.getElementById('in_time').value;
-            if(inTime) {
+            if (inTime) {
                 document.getElementById('out_time').innerText = inTime.replace(':', '.');
                 const sec = (document.getElementById('auto_time_chk') && document.getElementById('auto_time_chk').checked) ? liveSeconds : '00';
                 document.getElementById('out_stampTime').innerText = `${inTime}:${sec}`;
@@ -840,7 +1071,7 @@
             items.forEach(item => {
                 const amount = item.qty * item.rate;
                 totalAmount += amount;
-                
+
                 // Helper to pad string
                 const padRight = (str, length) => (str + " ".repeat(length)).substring(0, length);
                 const padLeft = (str, length) => (" ".repeat(length) + str).slice(-length);
@@ -853,7 +1084,7 @@
                 const amtStr = padLeft(parseFloat(amount).toFixed(2), 8);
 
                 textTable += `${qtyStr} ${nameStr} ${rateStr} ${amtStr}\n`;
-                
+
                 // If name is longer, print rest on next line
                 if (item.name.length > 14) {
                     textTable += `    ${item.name.substring(14, 28)}\n`;
@@ -867,7 +1098,7 @@
 
             const sgstVal = totalAmount * (sgstPerc / 100);
             const cgstVal = totalAmount * (cgstPerc / 100);
-            
+
             // Round Net Amount standard way
             const netAmount = Math.round(totalAmount + sgstVal + cgstVal);
 
@@ -887,7 +1118,7 @@
             toggleField('chk_address2', 'out_address2');
             toggleField('chk_phone', 'out_phone');
             toggleField('chk_email', 'out_email');
-            
+
             toggleField('chk_billNo', 'out_billNo_wrap');
             toggleField('chk_table', 'out_table_wrap');
             toggleField('chk_date', 'out_date_wrap');
@@ -920,7 +1151,7 @@
             document.getElementById('out_footer').innerText = document.getElementById('in_footer').value;
 
             document.getElementById('out_totalAmount').innerText = formatCurrency(totalAmount);
-            
+
             document.getElementById('out_sgst_perc').innerText = formatCurrency(sgstPerc);
             document.getElementById('out_sgst_val').innerText = formatCurrency(sgstVal);
 
@@ -928,13 +1159,16 @@
             document.getElementById('out_cgst_val').innerText = formatCurrency(cgstVal);
 
             document.getElementById('out_netAmount').innerText = '₹ ' + formatCurrency(netAmount);
+
+            // Also update the 58mm thermal receipt
+            updateThermal();
         }
 
         // Add event listeners to all inputs to trigger update
         function attachListeners() {
             document.querySelectorAll('.admin-panel input, .admin-panel select').forEach(input => {
                 // we don't attach to item inputs here because they are dynamic and handled in renderItemsAdmin
-                if(!input.classList.contains('item-input') && input.id !== 'auto_time_chk' && !input.dataset.listener) {
+                if (!input.classList.contains('item-input') && input.id !== 'auto_time_chk' && !input.dataset.listener) {
                     input.addEventListener('input', (e) => {
                         if ((e.target.id === 'in_date' || e.target.id === 'in_time') && document.getElementById('auto_time_chk')) {
                             document.getElementById('auto_time_chk').checked = false;
@@ -950,33 +1184,140 @@
 
         // Add auto_time_chk listener specifically
         const autoTimeChk = document.getElementById('auto_time_chk');
-        if(autoTimeChk) {
-             autoTimeChk.addEventListener('change', () => {
-                 if(autoTimeChk.checked) {
-                     setupAutoDate(); // will do immediate tick
-                 }
-             });
+        if (autoTimeChk) {
+            autoTimeChk.addEventListener('change', () => {
+                if (autoTimeChk.checked) {
+                    setupAutoDate(); // will do immediate tick
+                }
+            });
+        }
+
+        // Printer mode: 'big' = 80mm, 'mobile' = 58mm
+        let currentPrinterMode = 'big';
+
+        function setPrinterMode(mode) {
+            currentPrinterMode = mode;
+            const bigReceipt = document.getElementById('printableArea');
+            const thermalWrap = document.getElementById('thermalWrap');
+            const tabBig = document.getElementById('tab-big');
+            const tabMobile = document.getElementById('tab-mobile');
+
+            if (mode === 'mobile') {
+                bigReceipt.style.display = 'none';
+                thermalWrap.classList.add('visible');
+                tabMobile.classList.add('active');
+                tabBig.classList.remove('active');
+            } else {
+                bigReceipt.style.display = '';
+                thermalWrap.classList.remove('visible');
+                tabBig.classList.add('active');
+                tabMobile.classList.remove('active');
+            }
+            updatePreview();
+        }
+
+        function updateThermal() {
+            const v = id => document.getElementById(id).value;
+            const chk = id => document.getElementById(id).checked;
+
+            const padRight = (str, length) => (str + " ".repeat(length)).substring(0, length);
+            const padLeft = (str, length) => (" ".repeat(length) + str).slice(-length);
+
+            const divider = "--------------------------------";
+
+            let output = "";
+
+            // Brand/Address (Optional to match EXACT style if user wants pure image look, image just had CASH BILL, but we'll keep if checked)
+            if (chk('chk_brandName')) output += padLeft(v('in_brandName').toUpperCase(), 16 + v('in_brandName').length / 2) + "\n";
+            if (chk('chk_cafeName')) output += padLeft(v('in_cafeName'), 16 + v('in_cafeName').length / 2) + "\n";
+
+            output += "           CASH BILL\n";
+
+            const inDate = v('in_date');
+            let outDate = '';
+            if (inDate) { const p = inDate.split('-'); outDate = `${p[2]}/${p[1]}/${p[0]}`; }
+            const inTime = v('in_time');
+            const billNo = chk('chk_billNo') ? v('in_billNo') : '';
+
+            output += `DT: ${outDate} @${inTime} BILL NO: ${billNo}\n`;
+            if (chk('chk_table')) {
+                output += `MACHINE NO : ${v('in_table')}\n`; // Using table as machine no per example if needed, or static
+            } else {
+                output += `MACHINE NO : 1\n`;
+            }
+
+            output += divider + "\n";
+            output += " ITEM       QTY   PRICE TOTAL\n";
+            output += divider + "\n";
+
+            let total = 0, totalQty = 0;
+            items.forEach(item => {
+                const amt = item.qty * item.rate;
+                total += amt;
+                totalQty += item.qty;
+
+                let nameStr = item.name.substring(0, 12);
+                nameStr = padRight(nameStr, 12);
+
+                const qtyStr = padLeft(String(item.qty), 3);
+                const priceStr = padLeft(parseFloat(item.rate).toFixed(2), 7);
+                const totalStr = padLeft(parseFloat(amt).toFixed(2), 8);
+
+                output += ` ${nameStr} ${qtyStr} ${priceStr} ${totalStr}\n`;
+            });
+
+            output += divider + "\n";
+
+            const nitemsStr = `NITEMS : ${items.length}`;
+            const nqtyStr = `NQTY :   ${totalQty.toFixed(3)}`;
+            output += ` ${padRight(nitemsStr, 12)} ${nqtyStr}\n\n`;
+
+            output += ` SUBTOTAL :             ${padLeft(parseFloat(total).toFixed(2), 7)}\n`;
+
+            const sgstP = chk('chk_sgst') ? (parseFloat(v('in_sgst')) || 0) : 0;
+            const cgstP = chk('chk_cgst') ? (parseFloat(v('in_cgst')) || 0) : 0;
+            const sgstV = total * (sgstP / 100);
+            const cgstV = total * (cgstP / 100);
+            const grand = Math.round(total + sgstV + cgstV);
+
+            if (sgstP) {
+                output += ` SGST @${sgstP}% :           ${padLeft(parseFloat(sgstV).toFixed(2), 7)}\n`;
+            }
+            if (cgstP) {
+                output += ` CGST @${cgstP}% :           ${padLeft(parseFloat(cgstV).toFixed(2), 7)}\n`;
+            }
+
+            output += divider + "\n";
+            output += ` GRAND TOT : \u20B9${parseFloat(grand).toFixed(2)}\n`;
+            output += divider + "\n";
+
+            if (chk('chk_footer') && v('in_footer')) {
+                output += `\n ${padLeft(v('in_footer'), 16 + v('in_footer').length / 2)}\n`;
+            }
+
+            document.getElementById('th_content').innerText = output;
         }
 
         function downloadPDF() {
             const element = document.getElementById('printableArea');
             const billNo = document.getElementById('in_billNo').value || 'receipt';
-            
-            // Temporary hide box shadow and border radius for clean pdf
+
             const oldBoxShadow = element.style.boxShadow;
             element.style.boxShadow = 'none';
 
+            // Use 58mm format for mobile printer, 80mm for big size
+            const paperWidth = currentPrinterMode === 'mobile' ? 58 : 80;
+            const paperHeight = currentPrinterMode === 'mobile' ? 160 : 200;
+
             const opt = {
-                margin:       2,
-                filename:     `Bill_${billNo}.pdf`,
-                image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { scale: 2 },
-                // Use a custom format mapping closely to 80mm thermal paper
-                jsPDF:        { unit: 'mm', format: [80, 200], orientation: 'portrait' }
+                margin: 1,
+                filename: `Bill_${billNo}_${currentPrinterMode === 'mobile' ? '58mm' : '80mm'}.pdf`,
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: [paperWidth, paperHeight], orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                // Restore styles
                 element.style.boxShadow = oldBoxShadow;
             });
         }
@@ -986,4 +1327,5 @@
         renderItemsAdmin(); // this calls updatePreview internally
     </script>
 </body>
+
 </html>
